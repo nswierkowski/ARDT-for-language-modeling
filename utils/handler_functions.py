@@ -70,8 +70,8 @@ def load_gpt2_embeddings(vocab, cache_path="cached_gpt2_embeddings.npy", model_n
         for word, idx in vocab.items():
             tokens = tokenizer(word, return_tensors="pt", add_special_tokens=False).to(device)
             outputs = model(**tokens)
-            hidden_states = outputs.last_hidden_state  # shape: (1, seq_len, hidden_size)
-            word_embedding = hidden_states.mean(dim=1).squeeze(0)  # shape: [hidden_size]
+            hidden_states = outputs.last_hidden_state 
+            word_embedding = hidden_states.mean(dim=1).squeeze(0)  
             embeddings[idx] = word_embedding
 
     np.save(cache_path, embeddings.cpu().numpy())

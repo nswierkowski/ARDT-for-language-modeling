@@ -1,0 +1,17 @@
+train_model:
+  dataset_name: "lewtun/music_genres_small"
+  test_size: 0.2
+  model_type: "lightgbm"
+  model_params:
+    mode: "regression"
+    context_size: 20
+    alpha: 0.7
+  model_dir: "./music_model/default/lewtun/music_genres_small"
+  dataset_dir: "./data.miniml/greengerong/leetcode"
+  tune: false
+
+
+run_model:
+  model_dir: "./music_model/default/lewtun/music_genres_small"
+  model_name: "ardt_model.pkl"
+  max_length: 20

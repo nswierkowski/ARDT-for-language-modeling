@@ -1,7 +1,7 @@
 import gc
 from sklearn.metrics.pairwise import cosine_similarity
 from xgboost import XGBRegressor
-from src.ardt import ARDT, ARDTEstimator
+from src.models.ardt import ARDT, ARDTEstimator
 from src.datasets.ardt_simple_dataset import ARDTSimpleDataset
 import numpy as np
 from sklearn.model_selection import train_test_split
@@ -14,7 +14,7 @@ import pickle
 import time
 import json
 
-from sklearn.experimental import enable_halving_search_cv  # noqa
+from sklearn.experimental import enable_halving_search_cv  
 from sklearn.model_selection import HalvingRandomSearchCV
 import scipy.stats as stats
 from sklearn.multioutput import MultiOutputRegressor
@@ -90,26 +90,9 @@ def nested_train_model(config_path):
         'alpha': stats.uniform(0.1, 1.0),
         
        # For lightgbm
-       # 'model_params__n_estimators': stats.randint(50, 200),
-       # 'model_params__max_depth': stats.randint(3, 10),
-       # 'model_params__learning_rate': stats.loguniform(1e-3, 1e-1),
-       
-       # For Decision Tree
-        # 'model_params_max_depth': stats.randint(3, 20),
-        # 'model_params_min_samples_split': stats.randint(2, 20),
-        # "model_params_min_samples_leaf": stats.randint(2, 20),
-        # "cpp_alpha": stats.uniform(0.1, 1.0),
-        
-        # For Random Forest
-        'model_params__n_estimators': stats.randint(10, 200),
-        'model_params__max_depth': stats.randint(3, 20),
-        'model_params__min_samples_split': stats.randint(2, 20),
-        'model_params__min_samples_leaf': stats.randint(1, 20),
-        
-        # For XGBoost
-        # 'model_params__n_estimators': stats.randint(50, 300),
-        # 'model_params__max_depth': stats.randint(3, 10),
-        # 'model_params__learning_rate': stats.loguniform(1e-3, 1e-1),
+       'model_params__n_estimators': stats.randint(50, 200),
+       'model_params__max_depth': stats.randint(3, 10),
+       'model_params__learning_rate': stats.loguniform(1e-3, 1e-1),
     }
     
     param_dist.update(HYPERPARAM_DISTS.get(model_type, {}))
@@ -194,7 +177,6 @@ def train_model(config_path):
     X_train, y_train, train_ds = build_xy(train_texts)
     X_test,  y_true,  test_ds  = build_xy(test_texts)
 
-    # tuning
     if cfg.get('tune', False):
         space = HYPERPARAM_DISTS.get(model_type, {})
         if isinstance(ardt.model, MultiOutputRegressor):
@@ -463,24 +445,6 @@ def train_model_collab(
     ardt.fit(train_texts)
 
     mean_cos_sim = ardt.score(X_test, y_true)
-    #std_cos_sim = np.std(cos_sims)
-
-  #  joblib.dump(ardt.model, model_dir / 'ardt_model.pkl')
-    # save_yaml({
-    #     'model_type': model_type,
-    #     'context_size': ardt.context_size,
-    #     'alpha': ardt.alpha,
-    #     'embed_dim': ardt.embed_dim
-    # }, model_dir / 'ardt_meta.yaml')
-   # pickle.dump(train_ds, open(data_dir / 'ardt_dataset.pkl', 'wb'))
-
-    # json.dump({
-    #     'mean_cosine_similarity': mean_cos_sim,
-    #    # 'std_cosine_similarity': std_cos_sim,
-    #     'train_size': len(train_ds),
-    #     'test_size': len(test_ds)
-    # }, open(model_dir / 'results.json', 'w'), indent=2)
-
     print(f"[INFO] Model saved to {model_dir}")
     print(f"[RESULT] Cosine Similarity: mean = {mean_cos_sim:.4f}")
 
@@ -515,41 +479,19 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    train_model_collab(
-        'lightgbm', 
-        "roneneldan/TinyStories", 
-        {'context_size': 97, 'alpha': 0.47},
-        {
-            # 'n_estimators': 100,
-            # 'max_depth': 5,
-            # 'learning_rate': 0.01,
-            # 'n_jobs': -1,
-            # "max_depth": 10,
-            # "min_samples_split": 8,
-            # "max_depth": 13,
-            # "min_samples_leaf": 12,
-            # "min_samples_split": 5
-            # "n_jobs": -1,
-            # "max_depth": 17,
-            # "min_samples_leaf": 11,
-            # "min_samples_split": 9,
-            # "n_estimators": 198
-        }, 
-        'glove')
-
-    # if args.command == 'train':
-    #     train_model(args.config)
-    # elif args.command == 'tune':
-    #     nested_train_model(args.config)
-    # elif args.command == 'run':
-    #     run_model(args.config)
-    # elif args.command == 'train_music':
-    #     train_music_model_with_ardt(args.config)
-    # elif args.command == 'run_music':
-    #     run_music_model(args.config)
-    # elif args.command == 'train_wave':
-    #     from src.wav_facade.wave import train_wave_model_from_hf
-    #     train_wave_model_from_hf(args.config)
-    # elif args.command == 'run_wave':
-    #     from src.wav_facade.wave import run_wavelet_model
-    #     run_wavelet_model(args.config)
+    if args.command == 'train':
+        train_model(args.config)
+    elif args.command == 'tune':
+        nested_train_model(args.config)
+    elif args.command == 'run':
+        run_model(args.config)
+    elif args.command == 'train_music':
+        train_music_model_with_ardt(args.config)
+    elif args.command == 'run_music':
+        run_music_model(args.config)
+    elif args.command == 'train_wave':
+        from src.wav_facade.wave import train_wave_model_from_hf
+        train_wave_model_from_hf(args.config)
+    elif args.command == 'run_wave':
+        from src.wav_facade.wave import run_wavelet_model
+        run_wavelet_model(args.config)

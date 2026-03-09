@@ -1,0 +1,12 @@
+train_model:
+  model_dir: "./model_wave/deepsynthbody/deepfake-ecg-small"
+  dataset_name: "deepsynthbody/deepfake-ecg-small"
+  split: "train"
+  test_size: 0.2
+  wavelet: "db4"
+  decomp_level: 3
+
+run_model:
+  model_dir: "./wave_model/default/deepsynthbody/deepfake-ecg-small"
+  model_name: "wave_model.pkl"
+  max_length: 20
