@@ -143,7 +143,7 @@ Key parameters include:
 
 ## References
 
-- **Paper**: On the Power of Decision Trees in Auto‑Regressive Language Modeling.  [Link]([https://arxiv.org/abs/XXXX](https://arxiv.org/abs/2409.19150))  (replace with the actual link).
+- **Paper**: On the Power of Decision Trees in Auto‑Regressive Language Modeling.  [Link](https://arxiv.org/abs/2409.19150)
 
 ---
 
